@@ -1,8 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import InfiniteScroll from "react-infinite-scroll-component";
 import NewsItem from "./NewsItem";
 import Spinner from "./Spinner";
+
+const capitalize = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
 
 const News = ({
   country = "in",
@@ -21,15 +25,7 @@ const News = ({
       searchQuery ? capitalize(searchQuery) : capitalize(category)
     } - NewsViews`;
     setPage(1);
-    // eslint-disable-next-line
   }, [category, searchQuery]);
-
-  const capitalize = useMemo(
-    () => (string) => {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    },
-    []
-  );
 
   const buildApiUrl = () => {
     const baseApiUrl = "https://newsapi.org/v2/";
@@ -42,44 +38,44 @@ const News = ({
     }
   };
 
+  const updateNews = useCallback(async () => {
+    setProgress(15);
+    const url = buildApiUrl();
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(url);
+      setProgress(39);
+      const parsedData = await response.json();
+      setProgress(70);
+
+      if (Array.isArray(parsedData.articles)) {
+        setArticles((prevArticles) =>
+          page === 1
+            ? parsedData.articles
+            : [...prevArticles, ...parsedData.articles]
+        );
+        setLoading(false);
+        setHasMore(parsedData.articles.length > 0);
+        setProgress(100);
+      } else {
+        console.error(
+          "Invalid data format: parsedData.articles is not an array"
+        );
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error fetching news data:", error);
+      setLoading(false);
+    }
+  }, [setProgress, setLoading, setArticles, setHasMore, page, buildApiUrl]);
+
   const fetchMoreData = () => {
     setPage((prevPage) => prevPage + 1);
   };
 
   useEffect(() => {
-    const updateNews = async () => {
-      setProgress(15);
-      const url = buildApiUrl();
-
-      setLoading(true);
-
-      try {
-        const response = await fetch(url);
-        setProgress(39);
-        const parsedData = await response.json();
-        setProgress(70);
-
-        if (Array.isArray(parsedData.articles)) {
-          setArticles((prevArticles) =>
-            page === 1
-              ? parsedData.articles
-              : [...prevArticles, ...parsedData.articles]
-          );
-          setLoading(false);
-          setHasMore(parsedData.articles.length > 0);
-          setProgress(100);
-        } else {
-          console.error(
-            "Invalid data format: parsedData.articles is not an array"
-          );
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Error fetching news data:", error);
-        setLoading(false);
-      }
-    };
-
     updateNews();
     // eslint-disable-next-line
   }, [page, category, searchQuery]);
