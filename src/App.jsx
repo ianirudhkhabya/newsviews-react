@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoadingBar from "react-top-loading-bar";
 import Navbar from "./components/Navbar";
 import News from "./components/News";
+import About from "./components/About";
 
 const App = () => {
   const [progress, setProgress] = useState(0);
@@ -114,6 +115,7 @@ const App = () => {
               />
             }
           />
+          <Route path="/about" element={<About />} />
           <Route
             path="/:searchQuery"
             element={
