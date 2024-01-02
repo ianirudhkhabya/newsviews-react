@@ -1,3 +1,4 @@
+import { memo } from "react";
 import PropTypes from "prop-types";
 
 const SearchBar = ({ handleQueryChange, handleSearchClick }) => {
@@ -9,7 +10,6 @@ const SearchBar = ({ handleQueryChange, handleSearchClick }) => {
         placeholder="Search"
         aria-label="Search"
         onChange={handleQueryChange}
-        style={{ outline: "none" }}
       />
       <button
         className="btn btn-outline-success"
@@ -27,4 +27,4 @@ SearchBar.propTypes = {
   handleSearchClick: PropTypes.func,
 };
 
-export default SearchBar;
+export default memo(SearchBar);
