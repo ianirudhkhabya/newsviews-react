@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import { useMemo } from "react";
 
 const NewsItem = ({
   title,
@@ -9,7 +10,7 @@ const NewsItem = ({
   date,
   source,
 }) => {
-  const formattedDate = new Date(date).toGMTString();
+  const formattedDate = useMemo(() => new Date(date).toGMTString(), [date]);
 
   return (
     <div className="my-3">
